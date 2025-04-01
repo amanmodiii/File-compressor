@@ -1,4 +1,4 @@
-# File Compression System - Modernized
+# File Compression System
 
 A comprehensive file compression system that uses the Huffman algorithm for text file compression. This update includes several modern features and security improvements.
 

@@ -65,7 +65,7 @@ const Header = () => {
                         <div className="flex items-center space-x-3">
                             <ThemeToggle />
                             <a
-                                href="https://github.com/yourusername/file-compressor"
+                                href="https://github.com/amanmodiii/File-compressor"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-white hover:text-blue-200 transition-colors text-sm flex items-center"
