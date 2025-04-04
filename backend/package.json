@@ -4,7 +4,7 @@
   "description": "Backend for text file compression app using Huffman algorithm",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && npx prisma generate",
+    "build": "node build.js",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "prisma:generate": "prisma generate",
@@ -40,6 +40,7 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
+    "ts-node": "^10.9.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -48,7 +49,6 @@
     "@types/node": "^20.13.6",
     "@types/pg": "^8.11.4",
     "prisma": "^5.10.2",
-    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.4"
   },

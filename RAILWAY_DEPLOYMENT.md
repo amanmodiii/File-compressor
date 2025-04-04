@@ -77,6 +77,27 @@ After deployment, your backend may need to run migrations to set up the database
 
 ## Troubleshooting
 
+### Module Not Found Error
+
+If you encounter a "Cannot find module '/app/dist/index.js'" error:
+
+1. This indicates that TypeScript compilation failed or the output directory structure is incorrect
+2. Verify your tsconfig.json has the correct settings:
+   - `"outDir": "./dist"` should be set
+   - `"rootDir": "./src"` should be set
+   - `"include": ["src/**/*"]` should be included to ensure all source files are compiled
+
+3. Check the build logs in Railway to see if TypeScript compilation succeeded
+4. If necessary, SSH into your Railway instance to investigate:
+   ```
+   railway login
+   railway connect
+   ```
+   Then check if the dist directory and index.js file exist:
+   ```
+   ls -la /app/dist
+   ```
+
 ### Database Connection Issues
 
 If you encounter database connection issues:
@@ -90,6 +111,11 @@ If your build fails:
 1. Check the logs in the "Deployments" tab
 2. Verify your package.json scripts are correctly configured
 3. Make sure all dependencies are properly listed in your package.json
+4. Ensure TypeScript is properly installed and configured
+5. Try running the build process locally to identify issues:
+   ```
+   npm run build
+   ```
 
 ### Frontend Can't Connect to Backend
 
@@ -97,6 +123,30 @@ If your frontend can't connect to your backend:
 1. Verify the NEXT_PUBLIC_API_URL is correctly set
 2. Check CORS settings in your backend to allow requests from your frontend domain
 3. Verify both services are running correctly
+
+## Manual Deployment Steps
+
+If you continue to encounter issues with automatic deployment, you can try these manual steps:
+
+1. Build your app locally:
+   ```
+   cd backend
+   npm run build
+   ```
+
+2. Verify the dist/index.js file exists locally
+
+3. Push the built code to Railway:
+   ```
+   railway up
+   ```
+
+4. Run migrations manually:
+   ```
+   railway run npm run db:deploy
+   ```
+
+5. Restart your service from the Railway dashboard
 
 ## Further Improvements
 
