@@ -4,7 +4,7 @@
   "description": "Backend for text file compression app using Huffman algorithm",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npx prisma generate",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "prisma:generate": "prisma generate",
@@ -19,6 +19,8 @@
     "db:seed": "npm run prisma:seed",
     "db:setup": "npm run db:migrate && npm run db:seed",
     "migrate": "ts-node src/scripts/migrate.ts",
+    "postinstall": "prisma generate",
+    "railway:deploy": "npm run build && npm run db:deploy && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

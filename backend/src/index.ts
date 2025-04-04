@@ -10,9 +10,25 @@ dotenv.config();
 
 const app: Express = express();
 
+// CORS Configuration
+const allowedOrigins = [
+  'http://localhost:3000',             // Local development
+  'http://localhost:3001',             // Local development alternate port
+  'https://file-compressor.railway.app', // Production domain - update this with your actual domain
+];
+
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend URL
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true // Allow cookies to be sent across domains
 }));
 app.use(express.json({ limit: '50mb' }));
