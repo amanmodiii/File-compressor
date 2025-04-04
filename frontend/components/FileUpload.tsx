@@ -8,7 +8,7 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileCompressed }) => {
-    const [file, setFile] = useState<File | null>(null);
+    const [_file, setFile] = useState<File | null>(null);
     const [content, setContent] = useState<string>('');
     const [fileName, setFileName] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -92,7 +92,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileCompressed }) => {
         setSuccess(null);
 
         try {
-            const response = await fetch('http://localhost:5000/api/compression/compress', {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${API_URL}/api/compression/compress`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

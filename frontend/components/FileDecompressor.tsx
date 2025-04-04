@@ -58,7 +58,7 @@ const FileDecompressor: React.FC = () => {
                     setCompressedData(base64Data);
                     setFile(selectedFile);
                 }
-            } catch (error) {
+            } catch (_error) {
                 setError('Error parsing .huff file. The file might be corrupted.');
                 setFile(null);
                 setCompressedData('');
@@ -129,7 +129,7 @@ const FileDecompressor: React.FC = () => {
                     const root = buildHuffmanTree(frequencyMap);
 
                     return { root, frequencyMap };
-                } catch (error) {
+                } catch (_error) {
                     throw new Error('Invalid Huffman key format. Please check your key and try again.');
                 }
             };

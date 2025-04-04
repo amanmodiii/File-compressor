@@ -100,7 +100,7 @@ export default function KeysPage() {
 
                     {keys.length === 0 ? (
                         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                            <p>You haven't compressed any files yet.</p>
+                            <p>You haven&apos;t compressed any files yet.</p>
                             <button
                                 onClick={() => router.push('/dashboard')}
                                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"

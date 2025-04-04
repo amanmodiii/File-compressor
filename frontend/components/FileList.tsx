@@ -272,7 +272,7 @@ const FileList: React.FC<FileListProps> = ({ refreshTrigger }) => {
                         </div>
                         <div className="p-4 flex-1 overflow-auto">
                             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-800 dark:text-blue-300 font-inter">
-                                <p>This is your Huffman key for this file. You'll need it to decompress your .huff file. Keep it safe!</p>
+                                <p>This is your Huffman key for this file. You&apos;ll need it to decompress your .huff file. Keep it safe!</p>
                             </div>
                             <pre className="whitespace-pre-wrap bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 rounded-lg font-mono text-sm overflow-auto max-h-64">{selectedKey}</pre>
                         </div>
