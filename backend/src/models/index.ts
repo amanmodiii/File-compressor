@@ -1,19 +1,10 @@
-import User from './User';
-import File from './File';
+import UserModel from './User';
+import FileModel from './File';
+import prisma from '../config/prisma';
 
-// Set up associations
-User.hasMany(File, {
-  foreignKey: 'userId',
-  as: 'files',
-  onDelete: 'CASCADE'
-});
+// Model exports
+export const User = UserModel;
+export const File = FileModel;
 
-File.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'user'
-});
-
-export {
-  User,
-  File
-}; 
+// Prisma client export for direct database access
+export { prisma }; 

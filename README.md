@@ -73,7 +73,7 @@ This key is essential for the decompression process as it allows the algorithm t
 ## Technical Stack
 
 - **Frontend**: React, Next.js, TailwindCSS, Framer Motion
-- **Backend**: Node.js, Express, Sequelize ORM
+- **Backend**: Node.js, Express, Prisma ORM
 - **Database**: PostgreSQL
 - **Authentication**: JWT-based auth with HTTP-only cookies
 
@@ -102,7 +102,8 @@ cd file-compressor
 ```
 cd backend
 npm install
-cp .env.example .env
+cp .env.example .env  # Edit this file with your database credentials
+npm run db:setup      # Sets up the database with migrations and seed data
 npm run dev
 ```
 
@@ -114,6 +115,8 @@ npm run dev
 ```
 
 4. Open your browser and navigate to http://localhost:3000
+
+For detailed database setup instructions, see [DATABASE_SETUP.md](backend/DATABASE_SETUP.md)
 
 ## API Endpoints
 

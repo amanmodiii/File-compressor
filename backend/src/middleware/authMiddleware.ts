@@ -33,17 +33,22 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
       const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
       // Get user from database
-      const user = await User.findByPk(decoded.id, {
-        attributes: { exclude: ['password'] } // Exclude password from returned data
-      });
+      const user = await User.findById(decoded.id);
 
       if (!user) {
         res.status(401).json({ message: 'Not authorized, user not found' });
         return;
       }
 
-      // Attach user to request object
-      (req as any).user = user;
+      // Attach user to request object - excluding password
+      (req as any).user = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      };
+      
       next();
     } catch (error) {
       // Token verification failed

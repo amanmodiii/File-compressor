@@ -18,14 +18,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Check if email already exists
-    const existingEmail = await User.findOne({ where: { email } });
+    const existingEmail = await User.findByEmail(email);
     if (existingEmail) {
       res.status(400).json({ message: 'Email already in use' });
       return;
     }
 
     // Check if username already exists
-    const existingUsername = await User.findOne({ where: { username } });
+    const existingUsername = await User.findByUsername(username);
     if (existingUsername) {
       res.status(400).json({ message: 'Username already taken' });
       return;
@@ -78,7 +78,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Find user by email
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findByEmail(email);
     if (!user) {
       res.status(401).json({ message: 'Invalid credentials' });
       return;

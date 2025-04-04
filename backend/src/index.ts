@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import compressionRoutes from './routes/compressionRoutes';
 import authRoutes from './routes/authRoutes';
-import sequelize from './config/database';
+import { prisma } from './models';
 
 dotenv.config();
 
@@ -28,36 +28,38 @@ app.get('/', (req: Request, res: Response) => {
   res.send('File Compression API is running');
 });
 
-// Sync database before starting the server
-const syncDatabase = async () => {
+// Start Express server
+const startServer = async () => {
   try {
-    // In development environment, force sync to drop and recreate tables 
-    // This helps with type conversion issues
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ force: true });
-      console.log('Database synchronized successfully (tables dropped and recreated)');
-    } else {
-      await sequelize.sync();
-      console.log('Database synchronized successfully');
-    }
+    // Connect to the database
+    await prisma.$connect();
+    console.log('Connected to database successfully');
+    
+    // Set port
+    const PORT = process.env.PORT || 5000;
+    
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   } catch (error) {
     console.error('Error connecting to database:', error);
     process.exit(1);
   }
 };
 
-// Start Express server
-const startServer = async () => {
-  await syncDatabase();
-  
-  // Set port
-  const PORT = process.env.PORT || 5000;
-  
-  // Start server
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-};
+// Handle application shutdown
+process.on('SIGINT', async () => {
+  await prisma.$disconnect();
+  console.log('Disconnected from database');
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  await prisma.$disconnect();
+  console.log('Disconnected from database');
+  process.exit(0);
+});
 
 startServer();
 

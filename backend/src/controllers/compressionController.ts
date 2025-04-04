@@ -99,13 +99,19 @@ export const getAllFiles = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    const files = await File.findAll({
-      where: { userId: user.id },
-      attributes: ['id', 'fileName', 'compressionRatio', 'fileSize', 'compressedSize', 'createdAt'],
-      order: [['createdAt', 'DESC']]
-    });
+    const files = await File.findByUserId(user.id);
     
-    res.status(200).json(files);
+    // Format the response to match the previous structure
+    const formattedFiles = files.map(file => ({
+      id: file.id,
+      fileName: file.fileName,
+      compressionRatio: file.compressionRatio,
+      fileSize: file.fileSize,
+      compressedSize: file.compressedSize,
+      createdAt: file.createdAt
+    }));
+    
+    res.status(200).json(formattedFiles);
   } catch (error) {
     console.error('Error fetching files:', error);
     res.status(500).json({ message: 'Error fetching files', error: (error as Error).message });
@@ -124,17 +130,25 @@ export const getFileById = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     
-    const file = await File.findOne({
-      where: { id: fileId, userId: user.id },
-      attributes: ['id', 'fileName', 'huffmanData', 'compressionRatio', 'fileSize', 'compressedSize', 'createdAt']
-    });
+    const file = await File.findById(fileId);
     
-    if (!file) {
+    if (!file || file.userId !== user.id) {
       res.status(404).json({ message: 'File not found or unauthorized' });
       return;
     }
     
-    res.status(200).json(file);
+    // Format the response
+    const formattedFile = {
+      id: file.id,
+      fileName: file.fileName,
+      huffmanData: file.huffmanData,
+      compressionRatio: file.compressionRatio,
+      fileSize: file.fileSize,
+      compressedSize: file.compressedSize,
+      createdAt: file.createdAt
+    };
+    
+    res.status(200).json(formattedFile);
   } catch (error) {
     console.error('Error fetching file:', error);
     res.status(500).json({ message: 'Error fetching file', error: (error as Error).message });
@@ -192,17 +206,16 @@ export const deleteFile = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     
-    // Only allow deletion of user's own files
-    const file = await File.findOne({
-      where: { id: fileId, userId: user.id }
-    });
+    // Get the file to check ownership
+    const file = await File.findById(fileId);
     
-    if (!file) {
+    if (!file || file.userId !== user.id) {
       res.status(404).json({ message: 'File not found or unauthorized' });
       return;
     }
     
-    await file.destroy();
+    // Delete the file
+    await File.delete(fileId);
     
     res.status(200).json({ message: 'File deleted successfully' });
   } catch (error) {
@@ -222,13 +235,17 @@ export const getAllKeys = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    const files = await File.findAll({
-      where: { userId: user.id },
-      attributes: ['id', 'fileName', 'huffmanData', 'createdAt'],
-      order: [['createdAt', 'DESC']]
-    });
+    const files = await File.findByUserId(user.id);
     
-    res.status(200).json(files);
+    // Format the response
+    const formattedFiles = files.map(file => ({
+      id: file.id,
+      fileName: file.fileName,
+      huffmanData: file.huffmanData,
+      createdAt: file.createdAt
+    }));
+    
+    res.status(200).json(formattedFiles);
   } catch (error) {
     console.error('Error fetching keys:', error);
     res.status(500).json({ message: 'Error fetching keys', error: (error as Error).message });

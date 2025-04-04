@@ -1,88 +1,64 @@
-import { DataTypes, Model, Optional } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import sequelize from '../config/database';
+import { File as PrismaFile } from '@prisma/client';
+import prisma from '../config/prisma';
 
-// Interface for File attributes
-interface FileAttributes {
-  id: string;
-  userId: number;
-  fileName: string;
-  huffmanData: string;
-  compressionRatio: number;
-  fileSize: number;
-  compressedSize: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-// Interface for File creation attributes
-interface FileCreationAttributes extends Optional<FileAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
-
-// File model class
-class File extends Model<FileAttributes, FileCreationAttributes> implements FileAttributes {
-  public id!: string;
-  public userId!: number;
-  public fileName!: string;
-  public huffmanData!: string;
-  public compressionRatio!: number;
-  public fileSize!: number;
-  public compressedSize!: number;
-
-  // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-}
-
-// Initialize model
-File.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: () => uuidv4(),
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id'
+// File model service
+export default {
+  // Create a new file
+  async create(data: {
+    userId: number;
+    fileName: string;
+    huffmanData: string;
+    compressionRatio: number;
+    fileSize: number;
+    compressedSize: number;
+  }): Promise<PrismaFile> {
+    return prisma.file.create({
+      data: {
+        id: uuidv4(),
+        ...data
       }
-    },
-    fileName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    huffmanData: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    compressionRatio: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    fileSize: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    compressedSize: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    });
   },
-  {
-    sequelize,
-    tableName: 'files',
-    timestamps: true,
+  
+  // Find a file by ID
+  async findById(id: string): Promise<PrismaFile | null> {
+    return prisma.file.findUnique({
+      where: { id }
+    });
+  },
+  
+  // Find files by user ID
+  async findByUserId(userId: number): Promise<PrismaFile[]> {
+    return prisma.file.findMany({
+      where: { userId }
+    });
+  },
+  
+  // Update a file
+  async update(
+    id: string, 
+    data: Partial<Omit<PrismaFile, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>
+  ): Promise<PrismaFile> {
+    return prisma.file.update({
+      where: { id },
+      data
+    });
+  },
+  
+  // Delete a file
+  async delete(id: string): Promise<PrismaFile> {
+    return prisma.file.delete({
+      where: { id }
+    });
+  },
+  
+  // Delete all files for a user
+  async deleteByUserId(userId: number): Promise<{ count: number }> {
+    const result = await prisma.file.deleteMany({
+      where: { userId }
+    });
+    
+    return { count: result.count };
   }
-);
-
-export default File; 
+}; 

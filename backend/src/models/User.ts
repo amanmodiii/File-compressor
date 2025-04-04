@@ -1,97 +1,96 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
 import bcrypt from 'bcrypt';
+import { User as PrismaUser } from '@prisma/client';
+import prisma from '../config/prisma';
 
-// User Attributes Interface
-interface UserAttributes {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+// Extend the Prisma User type with additional methods
+export interface UserWithMethods extends PrismaUser {
+  validatePassword(password: string): Promise<boolean>;
 }
 
-// User Creation Attributes - these are the fields that can be passed to create a new user
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
-
-// User Model
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: number;
-  public username!: string;
-  public email!: string;
-  public password!: string;
-  
-  // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  
-  // Method to validate password
-  public async validatePassword(password: string): Promise<boolean> {
-    return bcrypt.compare(password, this.password);
-  }
-}
-
-// Initialize User model
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        len: [3, 30] // Username length between 3 and 30 characters
+// User model service
+export default {
+  // Create a new user
+  async create(data: { username: string; email: string; password: string }): Promise<UserWithMethods> {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
+    
+    const user = await prisma.user.create({
+      data: {
+        ...data,
+        password: hashedPassword
       }
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true // Validate email format
-      }
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [6, 100] // Password length between 6 and 100 characters
-      }
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    }) as UserWithMethods;
+    
+    // Add the validatePassword method
+    user.validatePassword = async function(password: string): Promise<boolean> {
+      return bcrypt.compare(password, this.password);
+    };
+    
+    return user;
   },
-  {
-    sequelize,
-    tableName: 'users',
-    timestamps: true,
-    hooks: {
-      // Hash password before saving
-      beforeCreate: async (user: User) => {
-        if (user.password) {
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(user.password, salt);
-        }
-      },
-      beforeUpdate: async (user: User) => {
-        if (user.changed('password')) {
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(user.password, salt);
-        }
-      }
+  
+  // Find a user by ID
+  async findById(id: number): Promise<UserWithMethods | null> {
+    const user = await prisma.user.findUnique({
+      where: { id }
+    }) as UserWithMethods | null;
+    
+    if (user) {
+      user.validatePassword = async function(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
+      };
     }
+    
+    return user;
+  },
+  
+  // Find a user by email
+  async findByEmail(email: string): Promise<UserWithMethods | null> {
+    const user = await prisma.user.findUnique({
+      where: { email }
+    }) as UserWithMethods | null;
+    
+    if (user) {
+      user.validatePassword = async function(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
+      };
+    }
+    
+    return user;
+  },
+  
+  // Find a user by username
+  async findByUsername(username: string): Promise<UserWithMethods | null> {
+    const user = await prisma.user.findUnique({
+      where: { username }
+    }) as UserWithMethods | null;
+    
+    if (user) {
+      user.validatePassword = async function(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
+      };
+    }
+    
+    return user;
+  },
+  
+  // Update a user
+  async update(id: number, data: Partial<Omit<PrismaUser, 'id' | 'createdAt' | 'updatedAt'>>): Promise<UserWithMethods> {
+    // Hash password if it's being updated
+    if (data.password) {
+      const salt = await bcrypt.genSalt(10);
+      data.password = await bcrypt.hash(data.password, salt);
+    }
+    
+    const user = await prisma.user.update({
+      where: { id },
+      data
+    }) as UserWithMethods;
+    
+    user.validatePassword = async function(password: string): Promise<boolean> {
+      return bcrypt.compare(password, this.password);
+    };
+    
+    return user;
   }
-);
-
-export default User; 
+}; 
