@@ -11,7 +11,7 @@ const Footer = () => {
                         </p>
                     </div>
                     <div className="text-sm">
-                        <p>Built with Huffman Compression Algorithm</p>
+                        <p>Built by <a href="https://github.com/amanmodiii" className="underline">Aman Modi</a></p>
                     </div>
                 </div>
             </div>
