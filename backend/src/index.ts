@@ -14,7 +14,7 @@ const app: Express = express();
 const allowedOrigins = [
   'http://localhost:3000',             // Local development
   'http://localhost:3001',             // Local development alternate port
-  'https://file-compressor.railway.app', // Production domain - update this with your actual domain
+  'https://file-compressor.up.railway.app', // Production domain - update this with your actual domain
 ];
 
 // Middleware
