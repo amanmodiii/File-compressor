@@ -14,7 +14,8 @@ const app: Express = express();
 const allowedOrigins = [
   'http://localhost:3000',             // Local development
   'http://localhost:3001',             // Local development alternate port
-  'https://file-compressor.up.railway.app', // Production domain - update this with your actual domain
+  'https://file-compressor.up.railway.app', // Frontend Railway domain
+  'https://file-compressor-production-ef6a.up.railway.app' // Backend Railway domain
 ];
 
 // Middleware
@@ -42,6 +43,11 @@ app.use('/api/compression', compressionRoutes);
 // Home route
 app.get('/', (req: Request, res: Response) => {
   res.send('File Compression API is running');
+});
+
+// Health check route
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Start Express server

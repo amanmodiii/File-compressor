@@ -34,18 +34,32 @@ const FileList: React.FC<FileListProps> = ({ refreshTrigger, showDownloadOptions
             setLoading(true);
             setError(null);
 
+            console.log('Using API URL:', API_URL);
+
             const response = await fetch(`${API_URL}/api/compression/files`, {
-                credentials: 'include' // Include cookies for authentication
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Include cookies for authentication
+                mode: 'cors' // Explicitly set CORS mode
             });
 
+            console.log('Response status:', response.status);
+
             if (!response.ok) {
-                throw new Error('Failed to fetch files');
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Failed to fetch files: ${response.status} ${response.statusText}`);
             }
 
             const data = await response.json();
+            console.log('Files fetched:', data.length);
             setFiles(data);
         } catch (error) {
+            console.error('Fetch error:', error);
             setError((error as Error).message);
+            setFiles([]); // Set empty array on error
         } finally {
             setLoading(false);
         }
