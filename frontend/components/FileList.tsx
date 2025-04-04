@@ -14,9 +14,10 @@ interface File {
 
 interface FileListProps {
     refreshTrigger: number;
+    showDownloadOptions?: boolean;
 }
 
-const FileList: React.FC<FileListProps> = ({ refreshTrigger }) => {
+const FileList: React.FC<FileListProps> = ({ refreshTrigger, showDownloadOptions }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -24,13 +25,16 @@ const FileList: React.FC<FileListProps> = ({ refreshTrigger }) => {
     const [showKeyModal, setShowKeyModal] = useState<boolean>(false);
     const [selectedKey, setSelectedKey] = useState<string>('');
 
+    // Get API URL from environment variables
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
     // Fetch all files
     const fetchFiles = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await fetch('http://localhost:5000/api/compression/files', {
+            const response = await fetch(`${API_URL}/api/compression/files`, {
                 credentials: 'include' // Include cookies for authentication
             });
 
@@ -54,7 +58,7 @@ const FileList: React.FC<FileListProps> = ({ refreshTrigger }) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/compression/files/${id}`, {
+            const response = await fetch(`${API_URL}/api/compression/files/${id}`, {
                 method: 'DELETE',
                 credentials: 'include' // Include cookies for authentication
             });
@@ -73,7 +77,7 @@ const FileList: React.FC<FileListProps> = ({ refreshTrigger }) => {
     // Show Huffman key
     const handleShowKey = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/compression/files/${id}`, {
+            const response = await fetch(`${API_URL}/api/compression/files/${id}`, {
                 credentials: 'include' // Include cookies for authentication
             });
 
@@ -228,6 +232,17 @@ const FileList: React.FC<FileListProps> = ({ refreshTrigger }) => {
                                             >
                                                 View Key
                                             </motion.button>
+
+                                            {showDownloadOptions && (
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    onClick={() => window.open(`${API_URL}/api/compression/download/${file.id}`, '_blank')}
+                                                    className="bg-green-500 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-800 text-white font-bold py-1 px-3 rounded-lg text-xs transition-all duration-200"
+                                                >
+                                                    Download
+                                                </motion.button>
+                                            )}
 
                                             <motion.button
                                                 whileHover={{ scale: 1.05 }}

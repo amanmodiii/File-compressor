@@ -27,26 +27,27 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth provider component
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
+    // Get API URL from environment variables
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
     // Clear error
     const clearError = () => setError(null);
 
-    // Check if user is logged in on initial load
+    // Check if user is already authenticated
     useEffect(() => {
         const checkAuth = async () => {
-            setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:5000/api/auth/me', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include', // Include cookies
+                setIsLoading(true);
+                setError(null);
+
+                const response = await fetch(`${API_URL}/api/auth/me`, {
+                    credentials: 'include' // Include cookies for authentication
                 });
 
                 if (response.ok) {
@@ -71,20 +72,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
 
         checkAuth();
-    }, [router]);
+    }, [API_URL, router]);
 
-    // Login user
-    const login = async (email: string, password: string) => {
+    // Login function
+    const login = async (email: string, password: string): Promise<void> => {
         setIsLoading(true);
         setError(null);
+
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                credentials: 'include', // Include cookies
-                body: JSON.stringify({ email, password }),
+                credentials: 'include', // Include cookies for authentication
+                body: JSON.stringify({ email, password })
             });
 
             if (!response.ok) {
@@ -105,18 +107,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    // Register user
-    const register = async (username: string, email: string, password: string) => {
+    // Register function
+    const register = async (username: string, email: string, password: string): Promise<void> => {
         setIsLoading(true);
         setError(null);
+
         try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
+            const response = await fetch(`${API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                credentials: 'include', // Include cookies
-                body: JSON.stringify({ username, email, password }),
+                credentials: 'include', // Include cookies for authentication
+                body: JSON.stringify({ username, email, password })
             });
 
             if (!response.ok) {
@@ -137,13 +140,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    // Logout user
-    const logout = async () => {
+    // Logout function
+    const logout = async (): Promise<void> => {
         setIsLoading(true);
+
         try {
-            await fetch('http://localhost:5000/api/auth/logout', {
+            await fetch(`${API_URL}/api/auth/logout`, {
                 method: 'POST',
-                credentials: 'include', // Include cookies
+                credentials: 'include' // Include cookies for authentication
             });
 
             // Clear user state

@@ -19,13 +19,16 @@ export default function KeysPage() {
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const router = useRouter();
 
+    // Get API URL from environment variables
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
     // Fetch keys from the API
     const fetchKeys = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await fetch('http://localhost:5000/api/compression/keys', {
+            const response = await fetch(`${API_URL}/api/compression/keys`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
